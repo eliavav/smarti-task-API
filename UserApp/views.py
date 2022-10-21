@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from django.http.response import JsonResponse
@@ -6,15 +5,17 @@ from django.http.response import JsonResponse
 from UserApp.models import Users
 from UserApp.serializers import UsersSerializer
 
-# Create your views here.
-
 
 @csrf_exempt
 def usersAPI(request, id=0):
+    """
+    Handling requests
+    """
     if request.method == 'GET':
         users = Users.objects.all()
         users_serializer = UsersSerializer(users, many=True)
         return JsonResponse(users_serializer.data, safe=False)
+    # handling save data to database requests
     elif request.method == 'POST':
         users_data = JSONParser().parse(request)
         users_serializer = UsersSerializer(data=users_data)
@@ -38,7 +39,13 @@ def usersAPI(request, id=0):
 
 
 def search(request):
+    """
+    handling autocomplete search requests
+    @param request: the letter/s to search in database
+    @return: Username with requested letter/s/
+    """
     value = request.GET.get('value')
     users = Users.objects.filter(UserName__contains=value)
     users_serializer = UsersSerializer(users, many=True)
     return JsonResponse(users_serializer.data, safe=False)
+
